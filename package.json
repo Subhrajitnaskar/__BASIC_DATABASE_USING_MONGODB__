@@ -1,0 +1,25 @@
+{
+  "name": "__basic_database_using_mongodb__",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Subhrajitnaskar/__BASIC_DATABASE_USING_MONGODB__.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Subhrajitnaskar/__BASIC_DATABASE_USING_MONGODB__/issues"
+  },
+  "homepage": "https://github.com/Subhrajitnaskar/__BASIC_DATABASE_USING_MONGODB__#readme",
+  "dependencies": {
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.7.4"
+  }
+}
