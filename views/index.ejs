@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini watshapp</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css?v=3">
 </head>
 <body>
     <h3> All Chats </h3>
@@ -16,7 +16,7 @@
             <p> from: <i><%= chat.from %></i></p> 
             <div class="msg">
                 <p><%= chat.msg %></p>
-                <form method="GET"action="/chats/<%= chat._id %>">
+                <form method="GET"action="/chats/<%= chat._id %>/edit">
                     <button>Edit</button>
                 </form>
                 <br />
@@ -26,8 +26,8 @@
             </div>
             <p>Received by <i><%= chat.to %></i></p>
             <hr />
-            <p><%=chat.created_at.toString().split("")[4] %></p>
-            <p><%=chat.created_at.toString().split("").slice(0,4).join("") %></p>
+            <p><%= chat.created_at.toLocaleTimeString() %></p>
+            <p><%= chat.created_at.toLocaleDateString() %></p>
         </div>
         <br /><br />
     <% } %>

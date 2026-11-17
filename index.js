@@ -2,18 +2,14 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
+const methodOverride = require("method-override");
 const Chat = require("./models/chat.js");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
-
-
-main()
-    .then(() => {
-        console.log("Connected to MongoDB");
-    })
-    .catch((err) => console.log(err));
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
 
 async function main() {
     await mongoose.connect("mongodb://127.0.0.1:27017/watshapp");
@@ -21,19 +17,13 @@ async function main() {
 
 //index route
 app.get("/chats", async (req, res) => {
-    let chats = await Chat.find();
-    res.render("index", {chats});
-});
-
-
-let chat1 = new Chat({
-    from: "Jitu",
-    to: "Ma",
-    msg: "Send me your Sheet",
-    created_at: new Date(),
-});
-chat1.save().then((res) => {
-    console.log(res);
+    try {
+        let chats = await Chat.find();
+        res.render("index.ejs", { chats });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Unable to load chats");
+    }
 });
 
 app.get("/chats/new", (req, res) => {
@@ -41,55 +31,80 @@ app.get("/chats/new", (req, res) => {
 });
 
 app.post("/chats", async (req, res) => {
-    let {from, to, msg} = req.body;
-    let newchat = new Chat({
-        from: from,
-        to: to,
-        msg: msg,
-        created_at: new Date(),
-    });
+    try {
+        let { from, to, msg } = req.body;
+        let newchat = new Chat({
+            from: from,
+            to: to,
+            msg: msg,
+            created_at: new Date(),
+        });
 
-    newchat
-    .save()
-    .then((res) => {
+        await newchat.save();
         console.log("Chat Save");
-    })
-    .catch((err) => {
+        res.redirect("/chats");
+    } catch (err) {
         console.log(err);
-    });    
-    res.redirect("/chats");
+        res.status(400).send("Unable to save chat. Please check the entered details.");
+    }
 });
 
-app.get("/chats/:id/edit", async(req,res)=> {
-    let {id} = req.params;
-    let chat = await Chat.findById(id);
-    res.render("edit.ejs", {chat});
+app.get("/chats/:id/edit", async (req, res) => {
+    try {
+        let { id } = req.params;
+        let chat = await Chat.findById(id);
+        if (!chat) return res.status(404).send("Chat not found");
+        res.render("edit.ejs", { chat });
+    } catch (err) {
+        console.log(err);
+        res.status(400).send("Invalid chat ID");
+    }
 });
 
-app.put("/chats/:id",async(req,res) => {
-    let {id} = req.params;
-    let{msg: newmsg} = req.body;
-    console.log(newmsg);
-    let updatedchat = await Chat.findByIdAndUpdate(
-        id,
-        {msg: newmsg},
-        {runValidators: true, new: true}
-    );
-    console.log(updatedchat);
-    res.redirect("/chats");
+app.put("/chats/:id", async (req, res) => {
+    try {
+        let { id } = req.params;
+        let { msg: newmsg } = req.body;
+        console.log(newmsg);
+        let updatedchat = await Chat.findByIdAndUpdate(
+            id,
+            { msg: newmsg },
+            { runValidators: true, new: true }
+        );
+        if (!updatedchat) return res.status(404).send("Chat not found");
+        console.log(updatedchat);
+        res.redirect("/chats");
+    } catch (err) {
+        console.log(err);
+        res.status(400).send("Unable to update chat");
+    }
 });
 
-app.delete("/chats/:id", async(req,res) => {
-    let {id} = req.params;
-    let deletedChat = await Chat.findByIdAndDelete(id);
-    console.log(deletedChat);
-    res.redirect("/chats");
+app.delete("/chats/:id", async (req, res) => {
+    try {
+        let { id } = req.params;
+        let deletedChat = await Chat.findByIdAndDelete(id);
+        if (!deletedChat) return res.status(404).send("Chat not found");
+        console.log(deletedChat);
+        res.redirect("/chats");
+    } catch (err) {
+        console.log(err);
+        res.status(400).send("Unable to delete chat");
+    }
 });
 
-app.get("/", (req,res) => {
+app.get("/", (req, res) => {
     res.send("Root is Working");
 });
 
-app.listen(8080, () => {
-    console.log("Server is running on port 8080");
-});
+main()
+    .then(() => {
+        console.log("Connected to MongoDB");
+        app.listen(8080, () => {
+            console.log("Server is running on port 8080");
+        });
+    })
+    .catch((err) => {
+        console.log("MongoDB connection error:", err);
+        process.exit(1);
+    });

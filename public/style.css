@@ -1,5 +1,6 @@
 body {
     margin-left: 20px;
+    color: #222;
 }
 
 .chat {
@@ -7,12 +8,18 @@ body {
     padding: 20px;
     border-radius: 16px;
     display: inline-block;
+    vertical-align: top;
 }
 
 .msg {
-    background-color: aliceblue;
-    color: white;
-    padding: 5px 15px;
-    border-radius: 16px;
+    background-color: #ffffff;
+    color: #222222 !important;
+    padding: 8px 15px;
+    border: 1px solid #d7e3ef;
+    border-radius: 12px;
 }
 
+.msg p {
+    color: #222222 !important;
+    overflow-wrap: anywhere;
+}
